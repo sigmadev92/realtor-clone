@@ -3,6 +3,7 @@ export default function Headers() {
   const pathLocation = useLocation();
   const navigate = useNavigate();
   function pathMatchRouter(route) {
+    console.log(pathLocation.pathname);
     if (pathLocation.pathname === route) return true;
   }
   return (
@@ -20,7 +21,7 @@ export default function Headers() {
           <ul className="flex space-x-10">
             <li
               className={`cursor-pointer border-b-[3px] border-b-transparent border-b-m-[3px]${
-                pathMatchRouter("/") && "text-blue border-b-red-700"
+                pathMatchRouter("/") && "text-blue-600 border-b-red-700"
               }`}
               onClick={() => navigate("/")}
             >
