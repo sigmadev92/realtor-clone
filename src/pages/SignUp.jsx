@@ -3,6 +3,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import OAuth from "../components/OAuth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { db } from "../firebase";
+import { Firestore, doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { toast } from "react-toastify";
 
 export default function SignUp() {
   const [formData, setData] = useState({
@@ -15,8 +23,6 @@ export default function SignUp() {
   const { email, password, name } = formData;
 
   function onchange(e) {
-    const field = e.target.id;
-    console.log(e.target.value);
     setData((prevStat) => ({
       ...prevStat,
       [e.target.id]: e.target.value,
@@ -26,6 +32,35 @@ export default function SignUp() {
     setShowPass((prev) => !prev);
   }
   const navigate = useNavigate();
+  async function handleSubmit(ev) {
+    ev.preventDefault();
+
+    try {
+      const auth = getAuth();
+      const userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredentials.user;
+      updateProfile(auth.currentUser, {
+        displayName: name,
+      });
+      console.log(user);
+      const formDataCopy = { ...formData };
+      delete formDataCopy.password;
+      formDataCopy.timeStamp = serverTimestamp();
+      await setDoc(doc(db, "users", user.uid), formDataCopy);
+
+      navigate("/");
+      toast.success("Sign UP was successful");
+    } catch (err) {
+      console.log(err);
+      navigate("/forgot-password");
+      // toast.error("Something went wrong");
+    }
+  }
+
   return (
     <section>
       <h1 className="text-center mt-6 text-2xl font-bold">Sign Up</h1>
@@ -39,7 +74,7 @@ export default function SignUp() {
         </div>
         <div className="h-100 sm:w-0 md:w-[1px] bg-black mx-[20px]" />
         <div className="  w-[350px] py-[20px]">
-          <form action="">
+          <form onSubmit={handleSubmit}>
             <input
               type="text"
               className="w-full mb-[20px] h-8 px-2 mt-3 text-red-500"
