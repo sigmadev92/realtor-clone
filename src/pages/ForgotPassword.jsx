@@ -1,7 +1,9 @@
+import { sendPasswordResetEmail, getAuth } from "firebase/auth";
 import React from "react";
 import { useState } from "react";
 
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function ForgotPassword() {
   const [email, setmail] = useState("");
@@ -10,6 +12,17 @@ export default function ForgotPassword() {
   }
   function handleClick() {
     console.log(email);
+  }
+  async function handleSubmit(e) {
+    e.preventDefault();
+    try {
+      const auth = getAuth();
+      await sendPasswordResetEmail(auth, email);
+      toast.success("Link Sent successfully.Check you spam folder too.");
+    } catch (err) {
+      console.log(err);
+      toast.error("The email you provided does not exist");
+    }
   }
 
   return (
@@ -25,9 +38,10 @@ export default function ForgotPassword() {
         </div>
         <div className="h-100 w-0 md:w-[1px] xl:w-[1px] bg-black mx-[20px]" />
         <div className="  w-[350px] py-[20px]">
-          <form action="">
+          <form onSubmit={handleSubmit}>
             <p className="text-bold">
-              An OTP will be sent to your registered email ID
+              A link to reset the password will be sent to the email id you
+              provide in the given box.
             </p>
             <input
               type="email"
@@ -43,7 +57,7 @@ export default function ForgotPassword() {
               className="bg-green-600 hover:bg-white w-full py-2"
               onClick={handleClick}
             >
-              GET OTP
+              RESET PASSWORD
             </button>
           </form>
         </div>

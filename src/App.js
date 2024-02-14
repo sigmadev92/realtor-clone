@@ -25,7 +25,7 @@ function App() {
       </Router>
       <ToastContainer
 position="top-center"
-autoClose={5000}
+autoClose={4000}
 hideProgressBar={false}
 newestOnTop={false}
 closeOnClick
@@ -33,7 +33,7 @@ rtl={false}
 pauseOnFocusLoss
 draggable
 pauseOnHover
-theme="light"
+theme="dark"
  
 />
    </>
