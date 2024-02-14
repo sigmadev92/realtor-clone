@@ -1,9 +1,10 @@
 import React from "react";
 import { useState } from "react";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
-
+import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
+import { toast } from "react-toastify";
 export default function SignIn() {
   const [formData, setData] = useState({
     email: "",
@@ -12,6 +13,7 @@ export default function SignIn() {
   const [showPass, setShowPass] = useState(true);
 
   const { email, password } = formData;
+  const navigate = useNavigate();
 
   function onchange(e) {
     const field = e.target.id;
@@ -23,6 +25,20 @@ export default function SignIn() {
   }
   function handleClick() {
     setShowPass((prev) => !prev);
+  }
+  async function handleSubmit(e) {
+    //Step-1 : first stop the page on reload on submitting the form
+    e.preventDefault();
+    //Step-2 : Try-Catch block
+    try {
+      const auth = getAuth();
+      const userCreds = await signInWithEmailAndPassword(auth, email, password);
+      if (userCreds.user) navigate("/");
+    } catch (err) {
+      console.log(err);
+      toast.error("User Authentication Failed. User Credentials Invalid");
+      navigate("/sign-in");
+    }
   }
 
   return (
@@ -38,7 +54,7 @@ export default function SignIn() {
         </div>
         <div className="h-100 w-0 md:w-[1px] xl:w-[1px] bg-black mx-[20px]" />
         <div className="  w-[350px] py-[20px]">
-          <form action="">
+          <form onSubmit={handleSubmit}>
             <input
               type="email"
               className="w-full mb-[30px] h-8 px-2 mt-3 text-blue-500"
