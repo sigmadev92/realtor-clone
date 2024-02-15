@@ -6,6 +6,7 @@ export default function Headers() {
   const pathLocation = useLocation();
   const navigate = useNavigate();
   const auth = getAuth();
+
   const [pageState, setPageState] = useState("Sign In");
 
   useEffect(() => {
@@ -15,8 +16,12 @@ export default function Headers() {
     });
   }, [auth]);
   function pathMatchRouter(route) {
-    console.log(pathLocation.pathname);
-    if (pathLocation.pathname === route) return true;
+    if (pathLocation.pathname === route) {
+      console.log(pathLocation.pathname);
+
+      return true;
+    }
+    return false;
   }
   return (
     <div className="bg-white border-b shadow-sm sticky top-0 z-50">
@@ -33,7 +38,7 @@ export default function Headers() {
           <ul className="flex space-x-10">
             <li
               className={`cursor-pointer border-b-[3px] border-b-transparent ${
-                pathMatchRouter("/") && "text-blue-600 border-b-black"
+                pathMatchRouter("/") && "text-blue-600 border-b-red-600"
               }`}
               onClick={() => navigate("/")}
             >
@@ -41,7 +46,7 @@ export default function Headers() {
             </li>
             <li
               className={`cursor-pointer border-b-[3px] border-b-transparent ${
-                pathMatchRouter("/offers") && "text-blue-600 border-b-black"
+                pathMatchRouter("/offers") && "text-blue-600 border-b-red-600"
               }`}
               onClick={() => navigate("/offers")}
             >
@@ -50,9 +55,11 @@ export default function Headers() {
             <li
               className={`cursor-pointer border-b-[3px] border-b-transparent ${
                 (pathMatchRouter("/sign-in") || pathMatchRouter("/profile")) &&
-                "text-blue border-b-black "
+                "text-blue border-b-red-600 "
               }`}
-              onClick={() => navigate("/profile")}
+              onClick={() => {
+                navigate("/profile");
+              }}
             >
               {pageState}
             </li>
