@@ -37,25 +37,29 @@ export default function Headers() {
         <div>
           <ul className="flex space-x-10">
             <li
-              className={`cursor-pointer border-b-[3px] border-b-transparent ${
-                pathMatchRouter("/") && "text-blue-600 border-b-red-600"
+              className={`cursor-pointer border-b-[3px] ${
+                pathMatchRouter("/")
+                  ? "text-blue-600 border-b-red-600"
+                  : "border-b-transparent"
               }`}
               onClick={() => navigate("/")}
             >
               Home
             </li>
             <li
-              className={`cursor-pointer border-b-[3px] border-b-transparent ${
-                pathMatchRouter("/offers") && "text-blue-600 border-b-red-600"
+              className={`cursor-pointer ${
+                pathMatchRouter("/offers") &&
+                "border-b-[3px] text-blue-600 border-b-red-600"
               }`}
               onClick={() => navigate("/offers")}
             >
               Offers
             </li>
             <li
-              className={`cursor-pointer border-b-[3px] border-b-transparent ${
-                (pathMatchRouter("/sign-in") || pathMatchRouter("/profile")) &&
-                "text-blue border-b-red-600 "
+              className={`cursor-pointer border-b-[3px] ${
+                pathMatchRouter("/sign-in") || pathMatchRouter("/profile")
+                  ? "text-blue border-b-red-600 "
+                  : "border-b-transparent"
               }`}
               onClick={() => {
                 navigate("/profile");
