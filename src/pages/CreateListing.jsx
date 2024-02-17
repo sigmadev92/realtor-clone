@@ -1,19 +1,44 @@
 import { useState } from "react";
-
+import Spinner from "../components/Spinner";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
+import { getAuth } from "firebase/auth";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
+import { db } from "../firebase.js";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 export default function CreateListing() {
+  const [geoLocationEnabled, setGeoLocationEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const auth = getAuth();
   const [formdata, setformdata] = useState({
     type: "rent",
     name: "",
 
     beds: 2,
     baths: 2,
-    furnished: false,
-    parking: false,
+    furnished: "yes",
+    parking: "yes",
     address: "",
     description: "",
-    offer: false,
+    offer: "yes",
     regPrice: 50,
     discPrice: 10,
+    latitude: 0,
+    longitude: 0,
+    images: {},
   });
   const {
     type,
@@ -28,34 +53,146 @@ export default function CreateListing() {
     offer,
     regPrice,
     discPrice,
+    latitude,
+    longitude,
+    images,
   } = formdata;
-  function onChange(event) {}
+
+  function onChange(event) {
+    if (event.target.files) {
+      setformdata((prev) => ({
+        ...prev,
+        images: event.target.files,
+      }));
+    } else
+      setformdata((prev) => ({
+        ...prev,
+        [event.target.id]: event.target.value,
+      }));
+  }
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setLoading(true);
+    // if(discPrice >= regPrice){
+    //     setLoading(false);
+    //     toast.error("Discount Price can not be greater than Regular price.")
+    // }
+    if (images.length > 6) {
+      setLoading(false);
+      toast.error("Images cannot be more than 6");
+    }
+
+    let geoLocation = {};
+    if (geoLocationEnabled) {
+      //that means developer has taken the GOOGLE API
+      //Environmental variable is taken for that only.
+      const response = await fetch(
+        "https://geocode.maps.co/search?q=555+5th+Ave+New+York+NY+10017+US&api_key=65cf494c62218930720582wovc2c48f"
+      );
+
+      console.log(response.arrayBuffer);
+      setLoading(false);
+    } else {
+      geoLocation.lat = latitude;
+      geoLocation.long = longitude;
+    }
+    async function storeImage(image) {
+      return new Promise((resolve, reject) => {
+        const storage = getStorage();
+        const filename = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`;
+        const storageRef = ref(storage, filename);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            // Observe state change events such as progress, pause, and resume
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log("Upload is " + progress + "% done");
+            switch (snapshot.state) {
+              case "paused":
+                console.log("Upload is paused");
+                break;
+              case "running":
+                console.log("Upload is running");
+                break;
+            }
+          },
+          (error) => {
+            // Handle unsuccessful uploads
+            reject(error);
+          },
+          () => {
+            // Handle successful uploads on complete
+            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              resolve(downloadURL);
+            });
+            setLoading(false);
+          }
+        );
+      });
+    }
+    const imgUrls = await Promise.all(
+      [...images].map((image) => storeImage(image))
+    ).catch((error) => {
+      setLoading(false);
+      toast.error("Images are not inserted in the database.");
+      return;
+    });
+    const formDataCopy = {
+      ...formdata,
+      imgUrls,
+      geoLocation,
+      timeStamp: serverTimestamp(),
+    };
+    delete formDataCopy.images;
+    delete formDataCopy.latitude;
+    delete formDataCopy.longitude;
+    if (offer === "no") {
+      console.log(formDataCopy.offer);
+      delete formDataCopy.discPrice;
+    }
+
+    const docRef = await addDoc(collection(db, "listings"), formDataCopy);
+    // await setDoc(doc(db, "listings", auth.currentUser.uid), formDataCopy);
+    setLoading(false);
+    toast.success("Listing created");
+    navigate(`/category/${formDataCopy.type}/${docRef.id}`);
+  }
+
+  if (loading) {
+    return <Spinner />;
+  }
   return (
     <main className="max-w-md px-2 mx-auto font-bold">
       <h1 className="text-3xl text-center mt-6 mb-6 fond-bold">
         Create a Listing
       </h1>
 
-      <form className=" bg-blue-300 px-4 py-3">
+      <form className=" bg-blue-300 px-4 py-3" onSubmit={handleSubmit}>
         <p className="mb-3">Sell/Rent</p>
         <div className="flex justify-between mb-4">
           <button
             type="button"
             id="type"
+            value="sell"
             className={` w-full mr-3 p-3 hover:bg-green-500 ${
               type === "sell" ? "bg-slate-500" : "bg-white"
             }`}
-            onChange={onChange}
+            onClick={onChange}
           >
             SELL
           </button>
           <button
             type="button"
             id="type"
+            value="rent"
             className={` w-full hover:bg-green-500 ${
               type === "rent" ? "bg-slate-500" : "bg-white"
             }`}
-            onChange={onChange}
+            onClick={onChange}
           >
             RENT
           </button>
@@ -81,6 +218,7 @@ export default function CreateListing() {
               value={beds}
               min="1"
               className="w-full p-4 text-center"
+              onChange={onChange}
             />
           </div>
           <div className="w-[40%] p-3">
@@ -88,9 +226,10 @@ export default function CreateListing() {
             <input
               type="number"
               value={baths}
-              id="beds"
+              id="baths"
               min="1"
               className="w-full p-4 text-center"
+              onChange={onChange}
             />
           </div>
         </div>
@@ -100,20 +239,22 @@ export default function CreateListing() {
           <button
             type="button"
             id="furnished"
+            value="yes"
             className={` w-full mr-3 p-3 hover:bg-green-500 ${
-              furnished ? "bg-slate-500" : "bg-white"
+              furnished === "yes" ? "bg-slate-500" : "bg-white"
             }`}
-            onChange={onChange}
+            onClick={onChange}
           >
             YES
           </button>
           <button
             type="button"
             id="furnished"
+            value="no"
             className={` w-full hover:bg-green-500 ${
-              !furnished ? "bg-slate-500" : "bg-white"
+              furnished === "no" ? "bg-slate-500" : "bg-white"
             }`}
-            onChange={onChange}
+            onClick={onChange}
           >
             No
           </button>
@@ -123,22 +264,22 @@ export default function CreateListing() {
           <button
             type="button"
             id="parking"
-            value={true}
+            value="yes"
             className={` w-full mr-3 p-3 hover:bg-green-500 ${
-              parking ? "bg-slate-500" : "bg-white"
+              parking === "yes" ? "bg-slate-500" : "bg-white"
             }`}
-            onChange={onChange}
+            onClick={onChange}
           >
             YES
           </button>
           <button
             type="button"
             id="parking"
-            value={false}
+            value="no"
             className={` w-full hover:bg-green-500 ${
-              !parking ? "bg-slate-500" : "bg-white"
+              parking === "no" ? "bg-slate-500" : "bg-white"
             }`}
-            onChange={onChange}
+            onClick={onChange}
           >
             NO
           </button>
@@ -154,6 +295,36 @@ export default function CreateListing() {
           onChange={onChange}
         ></textarea>
         <br />
+        {!geoLocationEnabled && (
+          <div className="flex justify-between mb-4">
+            <div className="w-full mr-3">
+              <p className="mb-3">Latitude</p>
+              <input
+                type="number"
+                id="latitude"
+                required
+                value={latitude}
+                onChange={onChange}
+                min={-90}
+                max={90}
+                className="w-full text-center"
+              />
+            </div>
+            <div className="w-full">
+              <p className="mb-3">Longitude</p>
+              <input
+                type="number"
+                id="longitude"
+                required
+                value={longitude}
+                onChange={onChange}
+                min={-180}
+                max={180}
+                className="w-full text-center"
+              />
+            </div>
+          </div>
+        )}
         <p className="mb-3">Description</p>
         <textarea
           required
@@ -170,20 +341,22 @@ export default function CreateListing() {
           <button
             type="button"
             id="offer"
+            value="yes"
             className={` p-3 w-full mr-10 hover:bg-green-500 ${
-              offer ? "bg-slate-500 text-white" : "bg-white"
+              offer === "yes" ? "bg-slate-500 text-white" : "bg-white"
             }`}
-            onChange={onChange}
+            onClick={onChange}
           >
             YES
           </button>
           <button
             type="button"
             id="offer"
+            value="no"
             className={`w-full p-3 hover:bg-green-500 ${
-              !offer ? "bg-slate-500 text-white" : "bg-white"
+              offer === "no" ? "bg-slate-500 text-white" : "bg-white"
             }`}
-            onChange={onChange}
+            onClick={onChange}
           >
             NO
           </button>
@@ -202,7 +375,7 @@ export default function CreateListing() {
           />
           {type === "rent" && <div className="mt-4 text-white">$/Month</div>}
         </div>
-        {offer && (
+        {offer === "yes" && (
           <div>
             <p className="mb-3">Discounted Price</p>
             <div className="flex">
@@ -211,8 +384,8 @@ export default function CreateListing() {
                 id="discPrice"
                 value={discPrice}
                 required
-                min="10"
-                max={regPrice * 0.5}
+                min={0}
+                max={regPrice * 0.9}
                 className="text-center p-4 w-[50%] mr-4"
                 onChange={onChange}
               />
@@ -233,7 +406,7 @@ export default function CreateListing() {
           id="images"
           onChange={onChange}
           accept=".jpg,.jpeg,.png"
-          max={6}
+          max="6"
           className="bg-white p-3 mb-4"
           multiple
         />
