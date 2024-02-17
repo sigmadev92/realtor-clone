@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { MdLocationPin } from "react-icons/md";
+import { MdLocationPin, MdEdit, MdDelete } from "react-icons/md";
 import Moment from "react-moment";
 
-export default function ListingItem({ listItem, id }) {
+export default function ListingItem({ listItem, id, onEdit, onDelete }) {
   return (
     <li>
       <Link to={`/category/${listItem.type}/${id}`}>
-        <div className="h-[250px] w-[200px] border-[3px] relative border-white pt-0 cursor-pointer rounded-xl shadow-2xl bg-yellow-200 -m-2">
+        <div className="h-[250px] w-[200px] border-[3px] relative border-white pt-0 cursor-pointer rounded-xl shadow-2xl bg-yellow-200 mr-5 hover:bg-white">
           <Moment
             fromNow
             className="absolute top-1 left-1 bg-pink-600 rounded-full z-10 text-[10px] py-1 px-3"
@@ -39,17 +39,22 @@ export default function ListingItem({ listItem, id }) {
           </span>
           {listItem.type === "rent" && <span>/ Month</span>}
           <br />
-          <div className="mt-1 font-extrabold text-xs">
+          <div className="mt-1 font-extrabold text-xs flex">
             <span className="ml-3 mr-2">
               {listItem.beds > 1 ? listItem.beds + " Beds " : "1 Bed"}
             </span>
             <span>
               {listItem.baths > 1 ? listItem.baths + " Baths" : "Bath"}
             </span>
-            <button type="button" className="ml-6 mr-2">
-              E
-            </button>
-            <button type="button">D</button>
+
+            <MdEdit
+              className="ml-6 mr-3 text-purple-800 text-xl cursor-pointer hover:bg-red-300"
+              onClick={onEdit}
+            />
+            <MdDelete
+              className="text-xl cursor-pointer hover:bg-red-300"
+              onClick={onDelete}
+            />
           </div>
         </div>
       </Link>

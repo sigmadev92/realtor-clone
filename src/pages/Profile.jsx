@@ -1,6 +1,7 @@
 import { getAuth, updateProfile } from "firebase/auth";
 import {
   collection,
+  deleteDoc,
   doc,
   getDocs,
   orderBy,
@@ -80,11 +81,25 @@ export default function Profile() {
     console.log(listings2);
     console.log(listings);
   }
+  async function handleEdit(listingId) {
+    navigate(`/edit-listing/${listingId}`);
+  }
+  async function handleDelete(listingId) {
+    if (window.confirm("Are you sure you want to delete the listing?")) {
+      await deleteDoc(doc(db, "listings", listingId));
+      const updatedListings = listings.filter((listing) => {
+        listing.id !== listingId;
+      });
+      setListings([...updatedListings]);
+      toast.success("Listing deleted successfully");
+    }
+    navigate("/profile");
+  }
 
   return (
     <section>
       <h1 className="text-center text-xl font-bold rounded-3xl">My Profile</h1>
-      <div className="w-[400px] mx-auto  rounded-3xl bg-blue-100 p-4 mt-5">
+      <div className="max-w-[300px] min-w-[100px] mx-auto  rounded-3xl bg-blue-100 p-4 mt-5">
         <form action="">
           <input
             type="text"
@@ -144,17 +159,19 @@ export default function Profile() {
           My Listings
         </h1>
         {clicked ? (
-          <div className="flex justify-center mt-4  w-auto mx-60  ">
+          <div className="max-w-[800px] mx-auto bg-white mt-4">
             {listings.length == 0 ? (
               <h1>You have no listings yet</h1>
             ) : (
-              <ul className="sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl-grid-cols-5 mt-6 mb-6">
+              <ul className="flex justify-between flex-wrap min-w-[100px] sm:justify-center">
                 {listings.map((item) => {
                   return (
                     <ListingItem
                       key={item.id}
                       id={item.id}
                       listItem={item.data}
+                      onEdit={() => handleEdit(item.id)}
+                      onDelete={() => handleDelete(item.id)}
                     />
                   );
                 })}
@@ -162,7 +179,11 @@ export default function Profile() {
             )}
           </div>
         ) : (
-          <div>Click on above button to see your listings.</div>
+          <div>
+            <h3 className="text-center">
+              Click on above button to see your listings.
+            </h3>
+          </div>
         )}
       </div>
     </section>
