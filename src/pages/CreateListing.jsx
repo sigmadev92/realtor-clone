@@ -146,6 +146,7 @@ export default function CreateListing() {
       imgUrls,
       geoLocation,
       timeStamp: serverTimestamp(),
+      userRef: auth.currentUser.uid,
     };
     delete formDataCopy.images;
     delete formDataCopy.latitude;
