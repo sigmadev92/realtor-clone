@@ -4,20 +4,15 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
-import { Swiper, SwiperSlide } from "swiper/react";
-import SwiperCore, {
-  EffectFade,
-  Autoplay,
-  Pagination,
-  Navigation,
-} from "swiper";
-import "swiper/css/bundle";
+
+import { FaShare } from "react-icons/fa";
 
 export default function Listing() {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sharelinkcopy, setsharelinkcopy] = useState(false);
   const params = useParams();
-  SwiperCore.use(Autoplay, Navigation, Pagination);
+
   useEffect(() => {
     async function fetchListing() {
       const docRef = doc(db, "listings", params.listingId);
@@ -34,23 +29,29 @@ export default function Listing() {
     }
     fetchListing();
   }, []);
+  function share(event) {}
 
   if (loading) return <Spinner />;
 
   return (
     <main>
-      <Swiper>
-        {listing.imgUrls.map((img, index) => {
-          <SwiperSlide key={index}>
-            <div
-              style={{
-                background: `url(${listing.imgUrls[index]}) center no-repeat`,
-                backgroundSize: "cover",
-              }}
-            ></div>
-          </SwiperSlide>;
-        })}
-      </Swiper>
+      <div className="w-full h-[1000px] bg-white">
+        <FaShare
+          className="bg-black rounded-full h-5 w-5 p-1 fixed text-red-500 top-[30%] right-[3%] hover:text-white cursor-pointer"
+          onClick={() => {
+            navigator.clipboard.writeText(window.location.href);
+            setsharelinkcopy(true);
+            setTimeout(() => {
+              setsharelinkcopy(false);
+            }, 1000);
+          }}
+        />
+        {sharelinkcopy && (
+          <p className="p-2 fixed top-[20%] right-[3%] bg-black text-white ">
+            copied to clipboard
+          </p>
+        )}
+      </div>
     </main>
   );
 }

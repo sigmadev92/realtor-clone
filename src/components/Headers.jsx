@@ -58,7 +58,7 @@ export default function Headers() {
             <li
               className={`cursor-pointer border-b-[3px] ${
                 pathMatchRouter("/sign-in") || pathMatchRouter("/profile")
-                  ? "text-blue border-b-red-600 "
+                  ? "text-blue-600 border-b-red-600 "
                   : "border-b-transparent"
               }`}
               onClick={() => {
