@@ -82,6 +82,7 @@ export default function Profile() {
     console.log(listings);
   }
   async function handleEdit(listingId) {
+    console.log("th-3");
     navigate(`/edit-listing/${listingId}`);
   }
   async function handleDelete(listingId) {
@@ -172,6 +173,9 @@ export default function Profile() {
                       listItem={item.data}
                       onEdit={() => handleEdit(item.id)}
                       onDelete={() => handleDelete(item.id)}
+                      onTouched={() =>
+                        navigate(`/category/${item.data.type}/${item.id}`)
+                      }
                     />
                   );
                 })}
