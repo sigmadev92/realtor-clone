@@ -7,25 +7,36 @@ import Spinner from "../components/Spinner";
 import { MdLocationOn } from "react-icons/md";
 import { FaBed } from "react-icons/fa";
 import { FaBath, FaChair } from "react-icons/fa6";
-import { MdChair } from "react-icons/md";
+
 import { FaParking } from "react-icons/fa";
+import { getAuth } from "firebase/auth";
 
 import { FaShare } from "react-icons/fa";
+import ContactLandlord from "../components/ContactLandlord";
 
 export default function Listing() {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [clicked, setClicked] = useState(false);
+  const [showButton, setShowButton] = useState(false);
   const [sharelinkcopy, setsharelinkcopy] = useState(false);
+
   const params = useParams();
 
   useEffect(() => {
     async function fetchListing() {
+      const auth = getAuth();
       const docRef = doc(db, "listings", params.listingId);
       const docSnap = await getDoc(docRef);
       if (docSnap) {
         setListing(docSnap.data());
         console.log(docSnap.data());
         setLoading(false);
+        if (
+          !auth.currentUser ||
+          docSnap.data().userRef !== auth.currentUser.uid
+        )
+          setShowButton(true);
       } else {
         setLoading(false);
         toast.error("Listing doesnot exits. Check the URL again and then try.");
@@ -34,7 +45,6 @@ export default function Listing() {
     }
     fetchListing();
   }, []);
-  function share(event) {}
 
   if (loading) return <Spinner />;
 
@@ -61,7 +71,11 @@ export default function Listing() {
         )}
       </div>
       <div className="p-3 bg-white md:flex md:w-[80%] md:mx-auto w-[100%] md:px-3 mb-[30px]  shadow-md">
-        <div className="w-[100%] md:w-[50%] h-[300px]  bg-white ">
+        <div
+          className={`w-[100%] md:w-[50%] h-[300px]  bg-white ${
+            clicked && "h-[500px]"
+          } mb-3`}
+        >
           <p className="ml-[3px] text-blue-500 font-bold">
             {listing.name} - ${listing.regPrice}
           </p>
@@ -113,6 +127,31 @@ export default function Listing() {
               </li>
             )}
           </ul>
+          {showButton && (
+            <div className="px-10 mt-[20px]">
+              {clicked ? (
+                <ContactLandlord
+                  landLordId={listing.userRef}
+                  listing={listing}
+                />
+              ) : (
+                <button
+                  className="w-full  bg-blue-500 uppercase text-sm py-1  cursor-pointer rounded-md font-bold hover:bg-black hover:text-white"
+                  onClick={() => setClicked(true)}
+                >
+                  contact landlord
+                </button>
+              )}
+              {clicked && (
+                <button
+                  className="w-full text-white bg-black hover:bg-red-400 font-bold text-[10px] py-2 mt-4"
+                  onClick={() => setClicked(false)}
+                >
+                  No dont send
+                </button>
+              )}
+            </div>
+          )}
         </div>
         <div className=" w-[100%] md:w-[50%] h-[300px] bg-yellow-300 text-center">
           <p className="uppercase">Goodle map API</p>
