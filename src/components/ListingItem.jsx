@@ -1,14 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdLocationPin, MdEdit, MdDelete } from "react-icons/md";
 import Moment from "react-moment";
+import { deleteDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
-export default function ListingItem({
-  listItem,
-  id,
-  onEdit,
-  onDelete,
-  onTouched,
-}) {
+export default function ListingItem({ listItem, id, auth }) {
+  const navigate = useNavigate();
+  async function handleDelete(listingId) {
+    if (window.confirm("Are you sure you want to delete the listing?")) {
+      await deleteDoc(doc(db, "listings", id));
+
+      toast.success("Listing deleted successfully");
+    }
+    navigate("/profile");
+  }
   return (
     <li>
       <div className="w-[100%] h-[100%] md:w-[350px] md:h-[100%] xl:w-[200px] xl:h-[280px] m-2 border-[3px] relative border-white pt-0 cursor-pointer rounded-xl shadow-2xl bg-yellow-200  hover:bg-white">
@@ -32,7 +37,7 @@ export default function ListingItem({
 
         <p
           className="font-semibold ml-3 truncate cursor-pointer hover:text-red-500"
-          onClick={onTouched}
+          onClick={() => navigate(`/category/${listItem.type}/${id}`)}
         >
           {listItem.name}
         </p>
@@ -54,16 +59,18 @@ export default function ListingItem({
         <span className="font-extrabold text-xs ">
           {listItem.baths > 1 ? listItem.baths + " Baths" : "Bath"}
         </span>
-        <div className="mt-1 font-extrabold text-xs flex flex-row-reverse px-[10px]">
-          <MdDelete
-            className="text-xl cursor-pointer hover:bg-red-300"
-            onClick={onDelete}
-          />
-          <MdEdit
-            className="ml-6 mr-3 text-purple-800 text-xl cursor-pointer hover:bg-red-300"
-            onClick={() => onEdit(id)}
-          />
-        </div>
+        {auth && (
+          <div className="mt-1 font-extrabold text-xs flex flex-row-reverse px-[10px]">
+            <MdDelete
+              className="text-xl cursor-pointer hover:bg-red-300"
+              onClick={handleDelete}
+            />
+            <MdEdit
+              className="ml-6 mr-3 text-purple-800 text-xl cursor-pointer hover:bg-red-300"
+              onClick={() => navigate(`/edit-listing/${id}`)}
+            />
+          </div>
+        )}
       </div>
     </li>
   );

@@ -81,21 +81,6 @@ export default function Profile() {
     console.log(listings2);
     console.log(listings);
   }
-  async function handleEdit(listingId) {
-    console.log("th-3");
-    navigate(`/edit-listing/${listingId}`);
-  }
-  async function handleDelete(listingId) {
-    if (window.confirm("Are you sure you want to delete the listing?")) {
-      await deleteDoc(doc(db, "listings", listingId));
-      const updatedListings = listings.filter((listing) => {
-        listing.id !== listingId;
-      });
-      setListings([...updatedListings]);
-      toast.success("Listing deleted successfully");
-    }
-    navigate("/profile");
-  }
 
   return (
     <section>
@@ -171,11 +156,7 @@ export default function Profile() {
                       key={item.id}
                       id={item.id}
                       listItem={item.data}
-                      onEdit={() => handleEdit(item.id)}
-                      onDelete={() => handleDelete(item.id)}
-                      onTouched={() =>
-                        navigate(`/category/${item.data.type}/${item.id}`)
-                      }
+                      auth={true}
                     />
                   );
                 })}
