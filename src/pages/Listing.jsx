@@ -13,6 +13,8 @@ import { getAuth } from "firebase/auth";
 
 import { FaShare } from "react-icons/fa";
 import ContactLandlord from "../components/ContactLandlord";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 export default function Listing() {
   const [listing, setListing] = useState(null);
@@ -153,8 +155,29 @@ export default function Listing() {
             </div>
           )}
         </div>
-        <div className=" w-[100%] md:w-[50%] h-[300px] bg-yellow-300 text-center">
-          <p className="uppercase">Goodle map API</p>
+        <div id="map" className=" w-[100%] md:w-[50%] h-[300px] z-10">
+          {listing ? (
+            <MapContainer
+              center={[listing.geoLocation.lat, listing.geoLocation.long]}
+              zoom={13}
+              scrollWheelZoom={true}
+              style={{ height: "100%", width: "100%" }}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Marker
+                position={[listing.geoLocation.lat, listing.geoLocation.long]}
+              >
+                <Popup>
+                  A pretty CSS3 popup. <br /> Easily customizable.
+                </Popup>
+              </Marker>
+            </MapContainer>
+          ) : (
+            "can't show map"
+          )}
         </div>
       </div>
     </main>

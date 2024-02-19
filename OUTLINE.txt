@@ -1,0 +1,12 @@
+LIST OF FRAMEWORKS USED IN THE PROJECT
+
+1) REACTJs -Front End Server
+2) Google Firebase-Storage and Authentication
+3) Tailwind Css-Styling
+4) Swiper - Carousel / Image Slider
+5) Geo Coding API (Billing Credit card details rqrd (NOt used))
+6) React Icons
+7) React Leaflet - Maps
+     >> npm i leaflet react-leaflet
+     Then got to index.html and place the link of leaflet from leaflet->download->link
+8) React-Toastify - For toasting messages on screen
