@@ -11,7 +11,7 @@ export default function ListingItem({
 }) {
   return (
     <li>
-      <div className="h-[250px] w-[200px] border-[3px] relative border-white pt-0 cursor-pointer rounded-xl shadow-2xl bg-yellow-200 mr-5 hover:bg-white">
+      <div className="w-[100%] h-[100%] md:w-[350px] md:h-[100%] xl:w-[200px] xl:h-[280px] m-2 border-[3px] relative border-white pt-0 cursor-pointer rounded-xl shadow-2xl bg-yellow-200  hover:bg-white">
         <Moment
           fromNow
           className="absolute top-1 left-1 bg-pink-600 rounded-full z-10 text-[10px] py-1 px-3"
@@ -20,7 +20,7 @@ export default function ListingItem({
         </Moment>
         <img
           src={listItem.imgUrls[0]}
-          className="w-full rounded-xl hover:scale-105 transition-scale duration-200 ease-in"
+          className="w-[100%] h-[50%] rounded-xl hover:scale-105 transition-scale duration-200 ease-in"
           alt="front image"
         />
         <div className="flex mt-2">
@@ -47,19 +47,21 @@ export default function ListingItem({
         </span>
         {listItem.type === "rent" && <span>/ Month</span>}
         <br />
-        <div className="mt-1 font-extrabold text-xs flex">
-          <span className="ml-3 mr-2">
-            {listItem.beds > 1 ? listItem.beds + " Beds " : "1 Bed"}
-          </span>
-          <span>{listItem.baths > 1 ? listItem.baths + " Baths" : "Bath"}</span>
 
-          <MdEdit
-            className="ml-6 mr-3 text-purple-800 text-xl cursor-pointer hover:bg-red-300"
-            onClick={() => onEdit(id)}
-          />
+        <span className="ml-3 mr-2 font-extrabold text-xs ">
+          {listItem.beds > 1 ? listItem.beds + " Beds " : "1 Bed"}
+        </span>
+        <span className="font-extrabold text-xs ">
+          {listItem.baths > 1 ? listItem.baths + " Baths" : "Bath"}
+        </span>
+        <div className="mt-1 font-extrabold text-xs flex flex-row-reverse px-[10px]">
           <MdDelete
             className="text-xl cursor-pointer hover:bg-red-300"
             onClick={onDelete}
+          />
+          <MdEdit
+            className="ml-6 mr-3 text-purple-800 text-xl cursor-pointer hover:bg-red-300"
+            onClick={() => onEdit(id)}
           />
         </div>
       </div>

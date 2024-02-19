@@ -1,5 +1,10 @@
-import React from "react";
+import Slider from "../components/Slider";
 
 export default function Home() {
-  return <h1 className="text-2xl underline">Home</h1>;
+  return (
+    <main>
+      <Slider />
+      <div></div>
+    </main>
+  );
 }

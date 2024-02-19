@@ -160,7 +160,7 @@ export default function CreateListing() {
     // await setDoc(doc(db, "listings", auth.currentUser.uid), formDataCopy);
     setLoading(false);
     toast.success("Listing created");
-    navigate(`/category/${formDataCopy.type}/${docRef.id}`);
+    navigate(`/profile`);
   }
 
   if (loading) {

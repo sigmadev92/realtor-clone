@@ -160,11 +160,11 @@ export default function Profile() {
           My Listings
         </h1>
         {clicked ? (
-          <div className="max-w-[800px] mx-auto bg-white mt-4">
+          <div className="max-w-[900px] mx-auto bg-white mt-4 flex justify-around">
             {listings.length == 0 ? (
               <h1>You have no listings yet</h1>
             ) : (
-              <ul className="flex justify-between flex-wrap min-w-[100px] sm:justify-center">
+              <ul className="md:flex md:justify-between flex-wrap justify-center">
                 {listings.map((item) => {
                   return (
                     <ListingItem
