@@ -64,9 +64,9 @@ export default function Home() {
         {offers && (
           <div
             id="offers"
-            className="md:w-[80%] mx-auto mb-8 bg-black w-full rounded-[14px]"
+            className="md:w-[80%] mx-auto mb-8 w-full rounded-[14px]"
           >
-            <h1 className="text-white  ml-3 font-bold">Recent offers</h1>
+            <h1 className="text-black  ml-3 font-bold">Recent offers</h1>
             <ul className="flex flex-wrap justify-between">
               {offers.map((doc, index) => {
                 if (index < 4)
@@ -91,6 +91,7 @@ export default function Home() {
                   return (
                     <ListingItem
                       key={doc.id}
+                      id={doc.id}
                       listItem={doc.data}
                       auth={auth.currentUser.uid === doc.data.userRef}
                     />
@@ -109,6 +110,7 @@ export default function Home() {
                     <ListingItem
                       key={doc.id}
                       listItem={doc.data}
+                      id={doc.id}
                       auth={auth.currentUser.uid === doc.data.userRef}
                     />
                   );
