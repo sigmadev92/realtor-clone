@@ -75,7 +75,10 @@ export default function Home() {
                       key={doc.id}
                       id={doc.id}
                       listItem={doc.data}
-                      auth={auth.currentUser.uid === doc.data.userRef}
+                      auth={
+                        auth.currentUser !== null &&
+                        auth.currentUser.uid === doc.data.userRef
+                      }
                     />
                   );
               })}
@@ -93,7 +96,10 @@ export default function Home() {
                       key={doc.id}
                       id={doc.id}
                       listItem={doc.data}
-                      auth={auth.currentUser.uid === doc.data.userRef}
+                      auth={
+                        auth.currentUser !== null &&
+                        auth.currentUser.uid === doc.data.userRef
+                      }
                     />
                   );
               })}
@@ -111,7 +117,10 @@ export default function Home() {
                       key={doc.id}
                       listItem={doc.data}
                       id={doc.id}
-                      auth={auth.currentUser.uid === doc.data.userRef}
+                      auth={
+                        auth.currentUser !== null &&
+                        auth.currentUser.uid === doc.data.userRef
+                      }
                     />
                   );
               })}

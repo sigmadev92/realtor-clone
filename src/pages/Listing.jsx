@@ -52,26 +52,48 @@ export default function Listing() {
 
   return (
     <main>
-      <div className="w-full h-[300px] bg-white  ">
-        <p className="text-center uppercase font-extrabold pt-[30px]">
-          A Swiper element is to be inserted here
-        </p>
-        <FaShare
-          className="bg-black rounded-full h-5 w-5 p-1 fixed text-red-500 top-[30%] right-[3%] hover:text-white cursor-pointer"
-          onClick={() => {
-            navigator.clipboard.writeText(window.location.href);
-            setsharelinkcopy(true);
-            setTimeout(() => {
-              setsharelinkcopy(false);
-            }, 1000);
-          }}
-        />
-        {sharelinkcopy && (
-          <p className="p-2 fixed top-[20%] right-[3%] bg-black text-white ">
-            copied to clipboard
-          </p>
-        )}
-      </div>
+      <swiper-container
+        slides-per-view="1"
+        speed="3000"
+        loop="true"
+        css-mode="true"
+        autoplay={false}
+        pagination
+        navigation={listing.imgUrls.length < 2 && false}
+      >
+        {listing &&
+          listing.imgUrls.map((img, index) => {
+            return (
+              <swiper-slide key={index}>
+                <div
+                  style={{
+                    background: `url(${img}) center no-repeat`,
+                  }}
+                  className="w-[80%] mx-auto h-[300px] relative cursor-pointer"
+                >
+                  <FaShare
+                    className="bg-black rounded-full h-5 w-5 p-1 fixed text-red-500 top-[30%] right-[10%] hover:text-white cursor-pointer"
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      setsharelinkcopy(true);
+                      console.log("CLCICIC");
+                      setTimeout(() => {
+                        setsharelinkcopy(false);
+                      }, 1000);
+                    }}
+                  />
+                  {sharelinkcopy && (
+                    <p className="p-2 fixed top-[20%] right-[3%] bg-black text-white z-10">
+                      copied to clipboard
+                    </p>
+                  )}
+                </div>
+              </swiper-slide>
+            );
+          })}
+      </swiper-container>
+
+      <div className="w-full h-[300px] mt-[-250px]"></div>
       <div className="p-3 bg-white md:flex md:w-[80%] md:mx-auto w-[100%] md:px-3 mb-[30px]  shadow-md">
         <div
           className={`w-[100%] md:w-[50%] h-[300px]  bg-white ${
