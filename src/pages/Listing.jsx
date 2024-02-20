@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { toast } from "react-toastify";
@@ -24,6 +24,7 @@ export default function Listing() {
   const [sharelinkcopy, setsharelinkcopy] = useState(false);
 
   const params = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchListing() {
@@ -42,7 +43,7 @@ export default function Listing() {
       } else {
         setLoading(false);
         toast.error("Listing doesnot exits. Check the URL again and then try.");
-        Navigate("/profile");
+        navigate("/profile");
       }
     }
     fetchListing();

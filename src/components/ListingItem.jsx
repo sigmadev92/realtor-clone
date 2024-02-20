@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import { MdLocationPin, MdEdit, MdDelete } from "react-icons/md";
 import Moment from "react-moment";
-import { deleteDoc } from "firebase/firestore";
+import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
+import { toast } from "react-toastify";
 
 export default function ListingItem({ listItem, id, auth }) {
   const navigate = useNavigate();
